@@ -72,8 +72,6 @@ function Post() {
         comments: []
       };
 
-      console.log('Post data before sending:', post); // Log post data for debugging
-
       // Add post to Firestore
       const docRef = await addDoc(collection(db, 'posts'), post);
       
@@ -88,12 +86,12 @@ function Post() {
         language: 'javascript'
       });
 
-      // Redirect to the post view page
+      // Redirect to the post view page or home page
       navigate(`/posts/${docRef.id}`);
       
     } catch (error) {
       console.error('Error creating post:', error);
-      setError(`Failed to create post: ${error.message}`);
+      setError('Failed to create post. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
