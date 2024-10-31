@@ -2,6 +2,9 @@
 import React, { useState } from 'react';
 import { Controlled as CodeMirror } from 'react-codemirror2';
 import ReactMarkdown from 'react-markdown';
+import { db, auth } from '../utils/firebase'; // Import Firebase utilities
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { useNavigate } from 'react-router-dom';
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/theme/material.css';
 import 'codemirror/mode/javascript/javascript';
@@ -10,6 +13,10 @@ import 'codemirror/mode/markdown/markdown';
 import './Post.css';
 
 function Post() {
+  const navigate = useNavigate();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState('');
+  
   const [postData, setPostData] = useState({
     title: '',
     code: '',
@@ -23,10 +30,71 @@ function Post() {
     { value: 'markdown', label: 'Markdown' }
   ];
 
-  const handleSubmit = (e) => {
+  const validatePost = () => {
+    if (!postData.title.trim()) {
+      setError('Please enter a title');
+      return false;
+    }
+    if (!postData.code.trim() && !postData.markdown.trim()) {
+      setError('Please enter either code or description');
+      return false;
+    }
+    return true;
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle post submission
-    console.log('Post submitted:', postData);
+    setError('');
+
+    // Validate the post
+    if (!validatePost()) return;
+
+    // Check if user is authenticated
+    if (!auth.currentUser) {
+      setError('Please log in to create a post');
+      navigate('/login');
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // Create post object
+      const post = {
+        title: postData.title,
+        code: postData.code,
+        markdown: postData.markdown,
+        language: postData.language,
+        userId: auth.currentUser.uid,
+        author: auth.currentUser.displayName || auth.currentUser.email,
+        createdAt: serverTimestamp(),
+        likes: 0,
+        comments: []
+      };
+
+      // Add post to Firestore
+      const docRef = await addDoc(collection(db, 'posts'), post);
+      
+      // Show success message
+      alert('Post created successfully!');
+      
+      // Reset form
+      setPostData({
+        title: '',
+        code: '',
+        markdown: '',
+        language: 'javascript'
+      });
+
+      // Redirect to the post view page or home page
+      navigate(`/posts/${docRef.id}`);
+      
+    } catch (error) {
+      console.error('Error creating post:', error);
+      setError('Failed to create post. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -35,6 +103,8 @@ function Post() {
         <div className="post-card">
           <h2>Create a Post</h2>
           
+          {error && <div className="error-message">{error}</div>}
+
           {/* Title Input */}
           <div className="form-group">
             <label>Post Title</label>
@@ -99,8 +169,12 @@ function Post() {
             </div>
           </div>
 
-          <button type="submit" className="submit-button">
-            Create Post
+          <button 
+            type="submit" 
+            className="submit-button"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? 'Creating Post...' : 'Create Post'}
           </button>
         </div>
       </form>

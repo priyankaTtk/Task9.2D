@@ -126,3 +126,18 @@
   .CodeMirror-gutters {
     border-right: 1px solid #ddd;
   }
+
+  /* Add to src/routes/Post.css */
+.error-message {
+  background-color: #fee2e2;
+  border: 1px solid #ef4444;
+  color: #dc2626;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+
+.submit-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
