@@ -1,0 +1,40 @@
+.input-group {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.input-group label {
+  width: 150px; /* Adjust the width as needed */
+  margin-right: 10px;
+  font-weight: bold;
+  font-size: 16px; /* Adjust the font size as needed */
+}
+
+.main-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.header-divv {
+  background-color: #f9f9f9;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  height: 100px;
+}
+
+.login-link {
+  margin-top: 20px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 24px;
+  text-size-adjust: 24px;
+}
+
+.login-link a {
+  color: #007bff;
+  text-decoration: none;
+} 
